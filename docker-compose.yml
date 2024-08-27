@@ -1,0 +1,44 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=mahbod
+      - POSTGRES_USER=mahbod
+      - POSTGRES_DB=blog
+      
+  
+    ports:
+      - "5432:5432"
+    networks:
+      - main
+    volumes:
+      - postgres_backup:/var/lib/posgresql/data
+
+  web:
+    build: .
+    container_name: web
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - postgres
+    ports:
+      - '8000:8000'
+    networks:
+      - main
+    environment:
+      - POSTGRES_PASSWORD=mahbod
+      - POSTGRES_USER=mahbod
+      - POSTGRES_DB=blog
+      
+    restart : always
+    volumes:
+      - .:/code
+
+
+
+
+networks:
+  main:
+
+volumes:
+  postgres_backup:
